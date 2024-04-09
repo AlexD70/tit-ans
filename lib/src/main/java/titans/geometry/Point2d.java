@@ -17,4 +17,11 @@ public class Point2d {
         }
         return (((Point2d)obj).x == x) && (((Point2d)obj).y == y);
     }
+
+    public double getX(){
+        return x;
+    }
+    public double getY(){
+        return y;
+    }
 }
