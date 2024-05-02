@@ -3,6 +3,7 @@ package titans.roads;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
+import org.apache.commons.math3.linear.*;
 import org.apache.commons.math3.optim.MaxIter;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.univariate.BrentOptimizer;
@@ -13,9 +14,27 @@ import titans.algebra.NPoly;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
 
+import java.util.Arrays;
+
 public class Spline {
     private NPoly xpoly, ypoly;
     private Point2d startPoint, endPoint;
+    private static final double[][] systemMatrix = {
+            {0,  0,  0, 0, 0, 1},
+            {0,  0,  0, 0, 1, 0},
+            {0,  0,  0, 2, 0, 0},
+            {1,  1,  1, 1, 1, 1},
+            {5,  4,  3, 2, 1, 0},
+            {20, 12, 6, 2, 0, 0}
+    };
+    private static final double[][] invertedSystemMatrix = {
+            {-6, -3, -0.5, 6, -3, 0.5},
+            {15,  8,  1.5, -15, 7, -1},
+            {-10,  -6,  -1.5, 10, -4, 0.5},
+            {0,  0,  0.5, 0, 0, 0},
+            {0,  1,  0, 0, 0, 0},
+            {1, 0, 0, 0, 0, 0}
+    };
 
     public Spline(){
         xpoly = new NPoly(5);
@@ -78,7 +97,6 @@ public class Spline {
         return deriv.getY() / deriv.getX();
     }
 
-    // unimplemented
     // this aims to replace the unit_arc_length function in segment.py
     // the Vector2d class also needs a function to transform its x, y representation
     // into a polar one r(cos t + i * sin t)
@@ -86,15 +104,75 @@ public class Spline {
         return new Vector2d();
     }
 
-    // unimplemented
-    public static Spline buildSpline(
+    public static Spline buildSpline6(
             Point2d start, Point2d end,
             Point2d startDeriv, Point2d endDeriv,
             Point2d start2ndDeriv, Point2d end2ndDeriv
     ){
-        return null;
-        // this results in an equation system with 6 variables and 6 equations
+        double[][] rValueX = {
+                {start.getX()}, {startDeriv.getX()}, {start2ndDeriv.getX()},
+                {end.getX()}, {endDeriv.getX()}, {end2ndDeriv.getX()}
+        };
+        double[][] rValueY = {
+                {start.getY()}, {startDeriv.getY()}, {start2ndDeriv.getY()},
+                {end.getY()}, {endDeriv.getY()}, {end2ndDeriv.getY()}
+        };
 
-        // how do we solve this programmatically???
+        RealMatrix matrix = new BlockRealMatrix(invertedSystemMatrix);
+        RealMatrix resultX = matrix.multiply(new BlockRealMatrix(rValueX));
+        RealMatrix resultY = matrix.multiply(new BlockRealMatrix(rValueY));
+
+        NPoly xpoly = new NPoly(5);
+        xpoly.assignCoefficients(resultX.getColumn(0));
+        NPoly ypoly = new NPoly(5);
+        ypoly.assignCoefficients(resultY.getColumn(0));
+
+        Spline spline =  new Spline();
+        spline.xpoly = xpoly;
+        spline.ypoly = ypoly;
+
+        return spline;
+    }
+
+    // TODO: use LU decomp to solve here
+    static RealMatrix A = MatrixUtils.createRealMatrix(systemMatrix);
+    static LUDecomposition lu = new LUDecomposition(A);
+    public static Spline buildSpline6_LU(
+            Point2d start, Point2d end,
+            Point2d startDeriv, Point2d endDeriv,
+            Point2d start2ndDeriv, Point2d end2ndDeriv
+    ){
+        double[] rValueX = {
+                start.getX(), startDeriv.getX(), start2ndDeriv.getX(),
+                end.getX(), endDeriv.getX(), end2ndDeriv.getX()
+        };
+        double[] rValueY = {
+                start.getY(), startDeriv.getY(), start2ndDeriv.getY(),
+                end.getY(), endDeriv.getY(), end2ndDeriv.getY()
+        };
+
+        DecompositionSolver solver = lu.getSolver();
+        RealVector xvec = new ArrayRealVector(rValueX, false);
+        RealVector yvec = new ArrayRealVector(rValueY, false);
+        RealVector resultX = solver.solve(xvec);
+        RealVector resultY = solver.solve(yvec);
+        NPoly xpoly = new NPoly(5);
+        xpoly.assignCoefficients(resultX.toArray());
+        NPoly ypoly = new NPoly(5);
+        ypoly.assignCoefficients(resultY.toArray());
+
+        Spline spline = new Spline();
+        spline.xpoly = xpoly;
+        spline.ypoly = ypoly;
+
+        return spline;
+    }
+
+    public Double[] getXCoeffs(){
+        return xpoly.getCoeffs();
+    }
+
+    public Double[] getYCoeffs(){
+        return ypoly.getCoeffs();
     }
 }

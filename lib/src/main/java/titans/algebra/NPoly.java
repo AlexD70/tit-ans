@@ -57,6 +57,10 @@ public class NPoly {
         return deriv;
     }
 
+    public Double[] getCoeffs(){
+        return coeffs.toArray(new Double[6]);
+    }
+
     public NPoly getSecondDerivative(){
         return getDerivative().getDerivative();
     }
