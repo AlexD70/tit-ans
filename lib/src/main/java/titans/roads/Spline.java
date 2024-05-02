@@ -18,6 +18,7 @@ import java.util.Arrays;
 
 public class Spline {
     private NPoly xpoly, ypoly;
+    protected double length;
     private Point2d startPoint, endPoint;
     private static final double[][] systemMatrix = {
             {0,  0,  0, 0, 0, 1},
@@ -36,10 +37,7 @@ public class Spline {
             {1, 0, 0, 0, 0, 0}
     };
 
-    public Spline(){
-        xpoly = new NPoly(5);
-        ypoly = new NPoly(5);
-    }
+    protected Spline(){}
 
     public Point2d pointAt(double u){
         return new Point2d(xpoly.apply(u), ypoly.apply(u));
@@ -50,7 +48,7 @@ public class Spline {
         SimpsonIntegrator integrator = new SimpsonIntegrator();
 
         return integrator.integrate(
-                10,
+                1000,
                 (t) -> Math.sqrt(Math.pow(xpoly.apply(t) - startPoint.getX(), 2) + Math.pow(ypoly.apply(t) - startPoint.getY(), 2)),
                 0,
                 Integer.MAX_VALUE
@@ -101,7 +99,7 @@ public class Spline {
     // the Vector2d class also needs a function to transform its x, y representation
     // into a polar one r(cos t + i * sin t)
     public Vector2d positionVectorAt(double u){
-        return new Vector2d();
+        return new Vector2d(xpoly.apply(u), ypoly.apply(u));
     }
 
     public static Spline buildSpline6(
@@ -128,8 +126,11 @@ public class Spline {
         ypoly.assignCoefficients(resultY.getColumn(0));
 
         Spline spline =  new Spline();
+        spline.startPoint = start;
+        spline.endPoint = end;
         spline.xpoly = xpoly;
         spline.ypoly = ypoly;
+        spline.length = spline.displacementAt(1);
 
         return spline;
     }
@@ -162,8 +163,11 @@ public class Spline {
         ypoly.assignCoefficients(resultY.toArray());
 
         Spline spline = new Spline();
+        spline.startPoint = start;
+        spline.endPoint = end;
         spline.xpoly = xpoly;
         spline.ypoly = ypoly;
+        spline.length = spline.displacementAt(1);
 
         return spline;
     }
