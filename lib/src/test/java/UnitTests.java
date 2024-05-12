@@ -17,12 +17,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UnitTests {
     // points used for testing
-    public Point2d p1 = new Point2d(1, 2),
-            p2 = new Point2d(-5, 3.3),
-            p3 = new Point2d(4, -5),
-            p4 = new Point2d(8, 18),
-            p5 = new Point2d(-0.2, 1.5),
-            p6 = new Point2d(3, 3);
+    public Point2d p1 = new Point2d(0.732, 2.901),
+            p2 = new Point2d(-5.17, 3.3),
+            p3 = new Point2d(4.87, -5),
+            p4 = new Point2d(8.3, 18.33),
+            p5 = new Point2d(-0.233, 1.5),
+            p6 = new Point2d(-21, 3);
 
     // this test checks if the python output and the java output
     // are within an error margin of 0.00001 (set in the py source)

@@ -29,12 +29,12 @@ public class Spline {
             {20, 12, 6, 2, 0, 0}
     };
     private static final double[][] invertedSystemMatrix = {
-            {-6, -3, -0.5, 6, -3, 0.5},
-            {15,  8,  1.5, -15, 7, -1},
-            {-10,  -6,  -1.5, 10, -4, 0.5},
-            {0,  0,  0.5, 0, 0, 0},
-            {0,  1,  0, 0, 0, 0},
-            {1, 0, 0, 0, 0, 0}
+            {-6,  -3, -0.5,  6,  -3,  0.5},
+            { 15,  8,  1.5, -15,  7, -1},
+            {-10, -6, -1.5,  10, -4,  0.5},
+            { 0,   0,  0.5,  0,   0,  0},
+            { 0,   1,  0,    0,   0,  0},
+            { 1,   0,  0,    0,   0,  0}
     };
 
     protected Spline(){}
@@ -138,6 +138,7 @@ public class Spline {
     // TODO: use LU decomp to solve here
     static RealMatrix A = MatrixUtils.createRealMatrix(systemMatrix);
     static LUDecomposition lu = new LUDecomposition(A);
+    static DecompositionSolver solver = lu.getSolver();
     public static Spline buildSpline6_LU(
             Point2d start, Point2d end,
             Point2d startDeriv, Point2d endDeriv,
@@ -152,7 +153,6 @@ public class Spline {
                 end.getY(), endDeriv.getY(), end2ndDeriv.getY()
         };
 
-        DecompositionSolver solver = lu.getSolver();
         RealVector xvec = new ArrayRealVector(rValueX, false);
         RealVector yvec = new ArrayRealVector(rValueY, false);
         RealVector resultX = solver.solve(xvec);
