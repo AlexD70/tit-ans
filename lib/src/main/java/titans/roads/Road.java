@@ -2,6 +2,7 @@ package titans.roads;
 
 import org.apache.commons.math3.util.Pair;
 import titans.geometry.Point2d;
+import titans.geometry.Vector2d;
 
 import java.util.*;
 
@@ -63,4 +64,24 @@ public class Road {
         Spline s = output.getFirst();
         return s.tangentAt(s.uAtDisplacement(output.getSecond()));
     }
+
+    public double getCurvatureAtDisplacement(double d){
+        Pair<Spline, Double> output = getSegmentAtDisplacement(d);
+        Spline s = output.getFirst();
+
+        Vector2d vec1stDeriv = s.firstDerivativeAt(output.getSecond()).toVector();
+        Vector2d vec2ndDeriv = s.secondDerivativeAt(output.getSecond()).toVector();
+
+        return vec1stDeriv.cross(vec2ndDeriv) / Math.pow(vec2ndDeriv.abs(), 3);
+    }
+
+//    public Point2d getDerivAtDisplacement(double d){
+//        Pair<Spline, Double> output = getSegmentAtDisplacement(d);
+//        Spline s = output.getFirst();
+//
+//        Point2d deriv = s.firstDerivativeAt(output.getSecond());
+//        double abs = deriv.toVector().abs();
+//
+//        return new Point2d(deriv.getX() / abs, deriv.getY() / abs);
+//    }
 }

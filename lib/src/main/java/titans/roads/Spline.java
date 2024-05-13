@@ -17,7 +17,7 @@ import titans.geometry.Vector2d;
 import java.util.Arrays;
 
 public class Spline {
-    private NPoly xpoly, ypoly;
+    NPoly xpoly, ypoly;
     protected double length;
     private Point2d startPoint, endPoint;
     private static final double[][] systemMatrix = {

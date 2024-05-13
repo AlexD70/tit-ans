@@ -42,4 +42,21 @@ public class Vector2d {
     public double getR(){
         return r;
     }
+
+    public double abs(){
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
+    /*
+    cross(u1, u2) = | i   j   k | = (x1y2 - y1x2)k (for 2d vectors)
+                    | x1  y1  0 |
+                    | x2  y2  0 |
+     */
+    public double cross(Vector2d other){
+        return this.x * other.y - this.y * other.x;
+    }
+
+    public Vector2d diff(Vector2d other){
+        return new Vector2d(this.x - other.x, this.y - other.y);
+    }
 }

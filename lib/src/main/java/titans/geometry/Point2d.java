@@ -24,4 +24,7 @@ public class Point2d {
     public double getY(){
         return y;
     }
+    public Vector2d toVector(){
+        return new Vector2d(x, y);
+    }
 }
