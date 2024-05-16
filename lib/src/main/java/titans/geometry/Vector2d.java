@@ -56,6 +56,10 @@ public class Vector2d {
         return this.x * other.y - this.y * other.x;
     }
 
+    public Point2d toPoint(){
+        return new Point2d(x, y);
+    }
+
     public Vector2d diff(Vector2d other){
         return new Vector2d(this.x - other.x, this.y - other.y);
     }

@@ -16,12 +16,14 @@ This part of our codebase will be based on one of our alumni's work around wheel
 
 ## Project Roadmap
 
-- [ ] Geometry API
+- [x] Geometry API (probably not fully complete yet)
 - [ ] Algebra API?
 - [ ] Motion profile implementation
 - [ ] Heading interpolation
 - [x] Parametric curves implementation
-- [ ] RR-style path implementation (let's call them roads to differentiate ourselves)
+- [x] RR-style path implementation (let's call them roads to differentiate ourselves)
+- [ ] tangent calculation
 - [ ] Pure Pursuit path related stuff
 - [ ] Path following?
-- [ ] Road building API
+- [x] Road building API
+- [ ] Road building tests

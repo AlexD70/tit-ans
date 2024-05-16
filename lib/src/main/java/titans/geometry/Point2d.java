@@ -1,6 +1,7 @@
 package titans.geometry;
 
 // a point in a 2d space
+// the constructor with no parameters returns the origin point
 public class Point2d {
     double x = 0, y = 0;
 
@@ -26,5 +27,13 @@ public class Point2d {
     }
     public Vector2d toVector(){
         return new Vector2d(x, y);
+    }
+
+    public static Vector2d distVector(Point2d a, Point2d b){
+        return Vector2d.fromPolar(dist(a, b), Line2d.getSlope(a, b));
+    }
+
+    public static double dist(Point2d a, Point2d b){
+        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
     }
 }
