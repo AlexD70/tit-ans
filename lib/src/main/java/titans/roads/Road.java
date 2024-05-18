@@ -51,7 +51,7 @@ public class Road {
         }
 
         int index = binSearchRecursive(0, n, d);
-        return new Pair<>(segments.get(index), d - lenarr[index - 1]);
+        return new Pair<>(segments.get(index), Math.abs(d - ((index == 0)?(0):(lenarr[index - 1]))));
     }
 
     public Point2d pointAtDisplacement(double d){

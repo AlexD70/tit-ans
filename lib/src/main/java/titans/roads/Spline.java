@@ -4,7 +4,10 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
 import org.apache.commons.math3.linear.*;
+import org.apache.commons.math3.optim.InitialGuess;
+import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.MaxIter;
+import org.apache.commons.math3.optim.linear.SolutionCallback;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.univariate.BrentOptimizer;
 import org.apache.commons.math3.optim.univariate.SearchInterval;
@@ -49,9 +52,9 @@ public class Spline {
 
         return integrator.integrate(
                 1000,
-                (t) -> Math.sqrt(Math.pow(xpoly.apply(t) - startPoint.getX(), 2) + Math.pow(ypoly.apply(t) - startPoint.getY(), 2)),
+                (t) -> Math.sqrt(Math.pow(xpoly.getDerivative().apply(t), 2) + Math.pow(ypoly.getDerivative().apply(t), 2)),
                 0,
-                Integer.MAX_VALUE
+                u
         );
     }
 
@@ -61,16 +64,26 @@ public class Spline {
         UnivariateFunction fx = new UnivariateFunction() {
             @Override
             public double value(double x) {
-                return displacementAt(x);
+                // do the absolute value because brentopt
+                // doesnt search for fx = 0 but rather searches the function minimum
+                // and if the function happens to be negative at any point
+                // then the brentopt returns that rather than the desired point
+                return Math.abs(displacementAt(x) - d);
             }
         };
 
-        BrentOptimizer brentopt = new BrentOptimizer(5e-8, 1e-10);
+        BrentOptimizer brentopt = new BrentOptimizer(5e-5, 1e-7);
         UnivariatePointValuePair res = brentopt.optimize(
-                new MaxIter(100), new UnivariateObjectiveFunction(fx),
-                GoalType.MINIMIZE, new SearchInterval(0, 1)
+                new MaxEval(Integer.MAX_VALUE),
+                new MaxIter(1000),
+                new UnivariateObjectiveFunction(fx),
+                GoalType.MINIMIZE, new SearchInterval(0, 1),
+                // not sure this is a good first guess - some benchmarking required
+                new InitialGuess(new double[]{displacementAt(0.5)})
         );
 
+        System.out.println(res.getPoint());
+        System.out.println(res.getValue());
         return res.getPoint();
     }
 
@@ -170,6 +183,10 @@ public class Spline {
         spline.length = spline.displacementAt(1);
 
         return spline;
+    }
+
+    public static Spline getNullSpline(){
+        return new Spline();
     }
 
     public Double[] getXCoeffs(){

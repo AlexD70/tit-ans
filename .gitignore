@@ -1,9 +1,10 @@
 # Ignore Gradle project-specific cache directory
 .gradle
-.idea
 .vim
 
 # Ignore Gradle build output directory
 build
 *.class
 bin/
+
+__pycache__/
