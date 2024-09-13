@@ -22,8 +22,9 @@ This part of our codebase will be based on one of our alumni's work around wheel
 - [ ] Heading interpolation
 - [x] Parametric curves implementation
 - [x] RR-style path implementation (let's call them roads to differentiate ourselves)
-- [ ] tangent calculation
+- [x] tangent calculation
 - [ ] Pure Pursuit path related stuff
 - [ ] Path following?
 - [x] Road building API
 - [ ] Road building tests
+- [ ] equation & function cache to speed up computation

@@ -75,6 +75,10 @@ public class Road {
         return vec1stDeriv.cross(vec2ndDeriv) / Math.pow(vec2ndDeriv.abs(), 3);
     }
 
+    public double getLength(){
+        return totalLength;
+    }
+
 //    public Point2d getDerivAtDisplacement(double d){
 //        Pair<Spline, Double> output = getSegmentAtDisplacement(d);
 //        Spline s = output.getFirst();

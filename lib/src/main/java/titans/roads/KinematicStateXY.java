@@ -8,4 +8,10 @@ public class KinematicStateXY {
     public Point2d position;
     public Vector2d velocity;
     public Vector2d acceleration;
+
+    public KinematicStateXY(Point2d pos, Vector2d vel, Vector2d acc){
+        position = pos;
+        velocity = vel;
+        acceleration = acc;
+    }
 }
