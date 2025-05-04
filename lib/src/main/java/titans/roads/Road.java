@@ -10,7 +10,7 @@ public class Road {
     private final static int MAX_SEGMENTS = 30;
 
     protected ArrayList<Spline> segments = new ArrayList<>(MAX_SEGMENTS + 1);
-    private double[] lenarr = new double[MAX_SEGMENTS + 1];
+    protected double[] lenarr = new double[MAX_SEGMENTS + 1];
 
     private double totalLength = 0;
     private int n = 0;
@@ -29,8 +29,8 @@ public class Road {
     }
 
     private int binSearchRecursive(int start, int end, double search){
-        if(search <= lenarr[0]){
-            return 0;
+        if(search <= lenarr[start]){
+            return start;
         }
 
         if(start == end - 1){
@@ -54,6 +54,15 @@ public class Road {
         return new Pair<>(segments.get(index), Math.abs(d - ((index == 0)?(0):(lenarr[index - 1]))));
     }
 
+    public int getSegmentIndexAtDisplacement(double d){
+        if(d < 0 || d > totalLength){
+            throw new RuntimeException("Displacement out of bounds!");
+        }
+
+        int index = binSearchRecursive(0, n, d);
+        return index;
+    }
+
     public Point2d pointAtDisplacement(double d){
         Pair<Spline, Double> output = getSegmentAtDisplacement(d);
         return output.getFirst().pointAtDisplacement(output.getSecond());
@@ -65,14 +74,24 @@ public class Road {
         return s.tangentAt(s.uAtDisplacement(output.getSecond()));
     }
 
+    public Point2d getDerivAtDisplacement(double d){
+        Pair<Spline, Double> segment = this.getSegmentAtDisplacement(d);
+        Spline s = segment.getFirst();
+        return s.firstDerivativeAt(s.uAtDisplacement(segment.getSecond()));
+    }
+
     public double getCurvatureAtDisplacement(double d){
         Pair<Spline, Double> output = getSegmentAtDisplacement(d);
         Spline s = output.getFirst();
+        System.out.print("output.second - u ");
 
-        Vector2d vec1stDeriv = s.firstDerivativeAt(output.getSecond()).toVector();
-        Vector2d vec2ndDeriv = s.secondDerivativeAt(output.getSecond()).toVector();
 
-        return vec1stDeriv.cross(vec2ndDeriv) / Math.pow(vec2ndDeriv.abs(), 3);
+        double u = s.uAtDisplacement(output.getSecond());
+        System.out.println(u);
+        Vector2d vec1stDeriv = s.firstDerivativeAt(u).toVector();
+        Vector2d vec2ndDeriv = s.secondDerivativeAt(u).toVector();
+
+        return vec1stDeriv.cross(vec2ndDeriv) / Math.pow(vec1stDeriv.abs(), 3);
     }
 
     public double getLength(){

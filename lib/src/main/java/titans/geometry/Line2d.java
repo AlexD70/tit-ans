@@ -17,7 +17,7 @@ public class Line2d {
         this.a = a;
         this.b = b;
 
-        slope = (b.y - a.y)/(b.x - a.x);
+        slope = Math.atan2(b.y - a.y, b.x - a.x);
 //        nTerm = a.y - slope * a.x;
     }
     public Line2d(Point2d a, double m){

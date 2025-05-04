@@ -1,6 +1,5 @@
 import org.json.JSONWriter;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.ModuleUtils;
 import titans.geometry.Point2d;
 import titans.roads.Spline;
 
@@ -9,13 +8,11 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Scanner;
-import java.util.Timer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class UnitTests {
+public class MathTests {
     // points used for testing
     public Point2d p1 = new Point2d(0.732, 2.901),
             p2 = new Point2d(-5.17, 3.3),

@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 public class Spline {
     NPoly xpoly, ypoly;
-    protected double length;
+    public double length;
     private Point2d startPoint, endPoint;
     private static final double[][] systemMatrix = {
             {0,  0,  0, 0, 0, 1},
@@ -82,8 +82,6 @@ public class Spline {
                 new InitialGuess(new double[]{displacementAt(0.5)})
         );
 
-        System.out.println(res.getPoint());
-        System.out.println(res.getValue());
         return res.getPoint();
     }
 
@@ -132,6 +130,8 @@ public class Spline {
         RealMatrix matrix = new BlockRealMatrix(invertedSystemMatrix);
         RealMatrix resultX = matrix.multiply(new BlockRealMatrix(rValueX));
         RealMatrix resultY = matrix.multiply(new BlockRealMatrix(rValueY));
+        System.out.println(resultX.toString());
+        System.out.println(resultY.toString());
 
         NPoly xpoly = new NPoly(5);
         xpoly.assignCoefficients(resultX.getColumn(0));

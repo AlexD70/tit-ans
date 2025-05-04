@@ -22,7 +22,7 @@ public class RoadTests {
     }
     static final double lenc1 = 3.4023;
     static final double MAX_LEN_ERR = 0.01;
-    Road road = new Road();
+    public Road road = new Road();
 
     public void buildTestRoad() throws IllegalAccessException, NoSuchFieldException {
         Spline c1 = Spline.getNullSpline();

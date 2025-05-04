@@ -28,3 +28,4 @@ This part of our codebase will be based on one of our alumni's work around wheel
 - [x] Road building API
 - [ ] Road building tests
 - [ ] equation & function cache to speed up computation
+- [ ] LUT
