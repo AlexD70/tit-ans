@@ -6,5 +6,6 @@
 build
 *.class
 bin/
+upgrade/
 
 __pycache__/
