@@ -64,4 +64,14 @@ public class NPoly {
     public NPoly getSecondDerivative(){
         return getDerivative().getDerivative();
     }
+
+    public String repr() {
+        String ret = "";
+
+        for(int i = 0; i <= n; i++){
+            ret = ret.concat(String.format("%f X^%d, ", coeffs.get(i), n - i));
+        }
+
+        return ret;
+    }
 }

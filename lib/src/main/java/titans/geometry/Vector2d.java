@@ -60,12 +60,17 @@ public class Vector2d {
         return new Point2d(x, y);
     }
 
-    public void mlt(double scalar){
+    public Vector2d mlt(double scalar){
         this.x *= scalar;
         this.y *= scalar;
+        return this;
     }
 
     public Vector2d diff(Vector2d other){
         return new Vector2d(this.x - other.x, this.y - other.y);
+    }
+
+    public Vector2d add(Vector2d other){
+        return new Vector2d(this.x + other.x, this.y + other.y);
     }
 }

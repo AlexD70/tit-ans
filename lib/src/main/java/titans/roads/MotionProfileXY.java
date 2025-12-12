@@ -58,8 +58,15 @@ public class MotionProfileXY {
         for(double d : linspaceDisplacement){
             double curvature = road.getCurvatureAtDisplacement(d);
             System.out.print("curvature: "); System.out.println(curvature);
-            double tan = road.getDerivAtDisplacement(d).toVector().abs();
-            double vmax_ang = constraints.maxAngVel / (curvature);
+            Point2d tanPoint = road.getDerivAtDisplacement(d);
+            double tan = 0;
+            if(tanPoint == null){
+                tan = Double.POSITIVE_INFINITY;
+            } else {
+                tan = tanPoint.toVector().abs();
+            }
+
+            double vmax_ang = constraints.maxAngVel / Math.abs(curvature);
             double vmax2 = Double.POSITIVE_INFINITY;
 
             sgm_num = road.getSegmentIndexAtDisplacement(d);
@@ -68,6 +75,10 @@ public class MotionProfileXY {
                 double waypoint_dist = road.lenarr[sgm_num] - road.lenarr[sgm_num - 1];
                 double time = Math.sqrt(2 * waypoint_dist / max_acc);
                 vmax2 = max_acc * time;
+
+                if(Double.isInfinite(tan)){
+                    vmax2 = 0;
+                }
             }
 
             if (Double.isNaN(vmax_ang) || Double.isInfinite(vmax_ang) || curvature < 0.01){
@@ -132,7 +143,7 @@ public class MotionProfileXY {
                 initAcc
         );
 
-        Vector2d tanVec = road.getDerivAtDisplacement(0).toVector();
+        Vector2d tanVec = road.getDerivAtDispNonnull(0).toVector();
         tanVec.mlt(1 / tanVec.abs());
 
         profile.addToProfile(profile.timeProfileX, 0, 0, initVel / tanVec.getX(), initAcc / tanVec.getX());
@@ -149,7 +160,7 @@ public class MotionProfileXY {
             double dt = ds / ((currentVel + lastVel) / 2); // ds / med_vel
             time += dt;
 
-            tanVec = road.getDerivAtDisplacement(current.getFirst()).toVector();
+            Point2d tanPoint = road.getDerivAtDispNonnull(current.getFirst());
             tanVec.mlt(1 / tanVec.abs()); // normalize the vector
 
             double vx = currentVel * tanVec.getX(), vy = currentVel * tanVec.getY();

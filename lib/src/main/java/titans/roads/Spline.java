@@ -3,6 +3,7 @@ package titans.roads;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
+import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.linear.*;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -50,12 +51,29 @@ public class Spline {
     public double displacementAt(double u){
         SimpsonIntegrator integrator = new SimpsonIntegrator();
 
-        return integrator.integrate(
-                1000,
-                (t) -> Math.sqrt(Math.pow(xpoly.getDerivative().apply(t), 2) + Math.pow(ypoly.getDerivative().apply(t), 2)),
-                0,
-                u
-        );
+        try {
+            return integrator.integrate(
+                    1000,
+                    (t) -> Math.sqrt(Math.pow(xpoly.getDerivative().apply(t), 2) + Math.pow(ypoly.getDerivative().apply(t), 2)),
+                    0,
+                    u
+            );
+        } catch (TooManyEvaluationsException e) {
+            try {
+                return integrator.integrate(
+                        1_000_000,
+                        (t) -> Math.sqrt(Math.pow(xpoly.getDerivative().apply(t), 2) + Math.pow(ypoly.getDerivative().apply(t), 2)),
+                        0,
+                        u
+                );
+            } catch (TooManyEvaluationsException e2) {
+                // TODO: this shouldnt crash the whole program - it might be better to throw a new error or log the error
+                e.printStackTrace();
+                System.exit(-1);
+            }
+        }
+
+        return 0;
     }
 
     public double uAtDisplacement(double d){

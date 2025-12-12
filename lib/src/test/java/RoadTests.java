@@ -48,8 +48,8 @@ public class RoadTests {
         length.set(c1, c1.displacementAt(1));
         length.set(c2, c2.displacementAt(1));
 
-        road.addSpline(c1);
-        road.addSpline(c2);
+        road.addSpline(c1, false);
+        road.addSpline(c2, false);
     }
 
     @Test
