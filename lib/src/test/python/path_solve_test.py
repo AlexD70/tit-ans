@@ -6,7 +6,7 @@ import numpy
 from scipy import linalg
 
 # TEST VARS
-MAX_TEST_TIME: int = 20000000 #ns
+MAX_TEST_TIME: int = 30 #ms
 MAX_ERROR: float = 0.00001
 
 coefficient_matrix: list[list[float]] = [
@@ -52,9 +52,10 @@ print(nparr[:, 0], nparr[:, 1])
 segment.compute_coeffs_for_testing(nparr[:, 0], nparr[:, 1])
 py_data: dict = segment.get_test_output_as_dict()
 
-#if java_data["time"] > MAX_TEST_TIME:
-#    print("FAIL: JAVA TEST TOOK TOO LONG")
-#    exit(1)
+if java_data["time"] > MAX_TEST_TIME:
+    t = java_data["time"]
+    print(f"FAIL: JAVA TEST TOOK TOO LONG {t}")
+    exit(1)
 
 for pair in zip(java_data["xcoef"], py_data["x"]):
     if abs(pair[0] - pair[1]) > MAX_ERROR:

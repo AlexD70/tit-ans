@@ -3,13 +3,13 @@ import titans.algebra.NPoly;
 import titans.geometry.Point2d;
 import titans.roads.Road;
 import titans.roads.Spline;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import org.apache.commons.math3.util.Pair;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RoadTests {
     static NPoly c1x = new NPoly(5), c1y = new NPoly(5);
@@ -47,6 +47,9 @@ public class RoadTests {
 
         length.set(c1, c1.displacementAt(1));
         length.set(c2, c2.displacementAt(1));
+
+        assertDoesNotThrow(c1::unsetNull);
+        assertDoesNotThrow(c2::unsetNull);
 
         road.addSpline(c1, false);
         road.addSpline(c2, false);

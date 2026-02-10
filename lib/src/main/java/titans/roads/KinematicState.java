@@ -1,5 +1,6 @@
 package titans.roads;
 
+// do not use. use the KinematicStateXY class instead.
 public class KinematicState {
     public double x, v, a;
 

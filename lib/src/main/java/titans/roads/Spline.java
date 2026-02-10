@@ -17,13 +17,16 @@ import org.apache.commons.math3.optim.univariate.UnivariatePointValuePair;
 import titans.algebra.NPoly;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
+import titans.util.NullSplineErr;
+import titans.util.Useless;
 
 import java.util.Arrays;
 
 public class Spline {
-    NPoly xpoly, ypoly;
-    public double length;
-    private Point2d startPoint, endPoint;
+    NPoly xpoly = null, ypoly = null;
+    public double length = -1;
+    private boolean isNull = true;
+    private Point2d startPoint = null, endPoint = null;
     private static final double[][] systemMatrix = {
             {0,  0,  0, 0, 0, 1},
             {0,  0,  0, 0, 1, 0},
@@ -44,11 +47,20 @@ public class Spline {
     protected Spline(){}
 
     public Point2d pointAt(double u){
+        if(isNull) {
+            throw new NullSplineErr();
+        }
         return new Point2d(xpoly.apply(u), ypoly.apply(u));
     }
 
     // integrates the position vector over (0, u) to get the distance travelled
     public double displacementAt(double u){
+        if(isNull){
+            throw new NullSplineErr();
+        }
+        if(u == 0){
+            return 0;
+        }
         SimpsonIntegrator integrator = new SimpsonIntegrator();
 
         try {
@@ -77,6 +89,9 @@ public class Spline {
     }
 
     public double uAtDisplacement(double d){
+        if(isNull){
+            throw new NullSplineErr();
+        }
          // skip checking if d > segment length for now
 
         UnivariateFunction fx = new UnivariateFunction() {
@@ -104,14 +119,23 @@ public class Spline {
     }
 
     public Point2d pointAtDisplacement(double d){
+        if(isNull){
+            throw new NullSplineErr();
+        }
         return pointAt(uAtDisplacement(d));
     }
 
     public Point2d firstDerivativeAt(double u) {
+        if(isNull){
+            throw new NullSplineErr();
+        }
         return new Point2d(xpoly.getDerivative().apply(u), ypoly.getDerivative().apply(u));
     }
 
     public Point2d secondDerivativeAt(double u){
+        if(isNull){
+            throw new NullSplineErr();
+        }
         return new Point2d(
                 xpoly.getSecondDerivative().apply(u),
                 ypoly.getSecondDerivative().apply(u)
@@ -120,6 +144,9 @@ public class Spline {
 
     // tangent or slope of the curve
     public double tangentAt(double u){
+        if(isNull){
+            throw new NullSplineErr();
+        }
         Point2d deriv = firstDerivativeAt(u);
         return deriv.getY() / deriv.getX();
     }
@@ -127,7 +154,11 @@ public class Spline {
     // this aims to replace the unit_arc_length function in segment.py
     // the Vector2d class also needs a function to transform its x, y representation
     // into a polar one r(cos t + i * sin t)
+    @Useless
     public Vector2d positionVectorAt(double u){
+        if(isNull) {
+            throw new NullSplineErr();
+        }
         return new Vector2d(xpoly.apply(u), ypoly.apply(u));
     }
 
@@ -148,19 +179,20 @@ public class Spline {
         RealMatrix matrix = new BlockRealMatrix(invertedSystemMatrix);
         RealMatrix resultX = matrix.multiply(new BlockRealMatrix(rValueX));
         RealMatrix resultY = matrix.multiply(new BlockRealMatrix(rValueY));
-        System.out.println(resultX.toString());
-        System.out.println(resultY.toString());
+        //System.out.println(resultX.toString());
+        //System.out.println(resultY.toString());
 
         NPoly xpoly = new NPoly(5);
         xpoly.assignCoefficients(resultX.getColumn(0));
         NPoly ypoly = new NPoly(5);
         ypoly.assignCoefficients(resultY.getColumn(0));
 
-        Spline spline =  new Spline();
+        Spline spline = new Spline();
         spline.startPoint = start;
         spline.endPoint = end;
         spline.xpoly = xpoly;
         spline.ypoly = ypoly;
+        spline.isNull = false;
         spline.length = spline.displacementAt(1);
 
         return spline;
@@ -198,6 +230,7 @@ public class Spline {
         spline.endPoint = end;
         spline.xpoly = xpoly;
         spline.ypoly = ypoly;
+        spline.isNull = false;
         spline.length = spline.displacementAt(1);
 
         return spline;
@@ -213,5 +246,13 @@ public class Spline {
 
     public Double[] getYCoeffs(){
         return ypoly.getCoeffs();
+    }
+
+    public void unsetNull() throws Exception{
+        if(xpoly != null && ypoly != null && length > 0){
+            isNull = false;
+        } else {
+            throw new Exception("Cannot unset null with empty polynomials or length");
+        }
     }
 }

@@ -4,6 +4,7 @@ import titans.algebra.NPoly;
 import titans.geometry.Line2d;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
+import titans.util.NullSplineErr;
 import titans.util.Unimplemented;
 
 import javax.annotation.Nonnull;
@@ -66,6 +67,12 @@ public class RoadBuilder {
         s.xpoly = xpoly;
         s.ypoly = ypoly;
         s.length = v.abs();
+        try {
+            s.unsetNull();
+        } catch (Exception e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
 
         boolean cont = Math.abs(startDeriv - Line2d.getSlope(startPoint, endPoint)) < eps;
         road.addSpline(s, cont);

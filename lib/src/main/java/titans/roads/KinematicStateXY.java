@@ -14,4 +14,18 @@ public class KinematicStateXY {
         velocity = vel;
         acceleration = acc;
     }
+
+    public static KinematicStateXY getLinearInterpolation(KinematicStateXY first, KinematicStateXY second, double timetotal, double timefromfirst){
+        Vector2d possum = first.position.toVector().add(second.position.toVector());
+        Vector2d velsum = first.velocity.add(second.velocity);
+        Vector2d accsum = first.acceleration.add(second.acceleration);
+
+        double interpolation_factor = timefromfirst / timetotal;
+
+        possum.mlt(interpolation_factor);
+        velsum.mlt(interpolation_factor);
+        accsum.mlt(interpolation_factor);
+
+        return new KinematicStateXY(possum.toPoint(), velsum, accsum);
+    }
 }

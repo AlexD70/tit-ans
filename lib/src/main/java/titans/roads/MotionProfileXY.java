@@ -66,7 +66,7 @@ public class MotionProfileXY {
                 tan = tanPoint.toVector().abs();
             }
 
-            double vmax_ang = constraints.maxAngVel / Math.abs(curvature);
+            double vmax_ang = constraints.maxAngVel / Math.abs(curvature * 2);
             double vmax2 = Double.POSITIVE_INFINITY;
 
             sgm_num = road.getSegmentIndexAtDisplacement(d);

@@ -16,7 +16,7 @@ public class Point2d {
         if(!(obj instanceof Point2d)){
             return false;
         }
-        return (((Point2d)obj).x == x) && (((Point2d)obj).y == y);
+        return (Math.abs(((Point2d)obj).x - x) < 0.0001) && (Math.abs(((Point2d)obj).y - y) < 0.0001);
     }
 
     public double getX(){

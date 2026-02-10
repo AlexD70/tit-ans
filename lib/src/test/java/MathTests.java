@@ -1,5 +1,6 @@
 import org.json.JSONWriter;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.function.ThrowingSupplier;
 import titans.geometry.Point2d;
 import titans.roads.Spline;
 
@@ -7,30 +8,98 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MathTests {
-    // points used for testing
-    public Point2d p1 = new Point2d(0.732, 2.901),
-            p2 = new Point2d(-5.17, 3.3),
-            p3 = new Point2d(4.87, -5),
-            p4 = new Point2d(8.3, 18.33),
-            p5 = new Point2d(-0.233, 1.5),
-            p6 = new Point2d(-21, 3);
+    public static final double EPS = 0.0001;
+    public void assertWithinError(double val, double ref){
+        assertTrue(Math.abs(val - ref) <= EPS,
+                String.format("Value %f out of the expected %f +- EPS interval.", val, ref));
+    }
+
+    void testDispFromParam(){
+        Spline s = RoadResources.MathTests.testSpline;
+        long millis = RoadResources.MathTests.MAX_MILLIS_INTEGRATION;
+
+        double ufin = 1, urand = Math.random(), ufirst = urand / 100000d;
+
+        ThrowingSupplier<Double> getLen = () -> s.displacementAt(ufin);
+        ThrowingSupplier<Double> getZero = () -> s.displacementAt(ufirst);
+        ThrowingSupplier<Double> getAny = () -> s.displacementAt(urand);
+        double resLen = assertTimeout(Duration.of(millis, ChronoUnit.MILLIS), getLen);
+        double resZero = assertTimeout(Duration.of(millis, ChronoUnit.MILLIS), getZero);
+        double resRand = assertTimeout(Duration.of(millis, ChronoUnit.MILLIS), getAny);
+
+        assertWithinError(resLen, s.length);
+        assertWithinError(resZero, 0);
+        assertTrue(0 <= resRand && resRand <= s.length,
+                String.format("ResRand %f exceeds bounds of 0, %f when u = %f.", resRand, s.length, urand));
+    }
+
+    void testParamFromDisp(){
+        Spline s = RoadResources.MathTests.testSpline;
+        long millis = RoadResources.MathTests.MAX_MILLIS_BRENTOPT;
+
+        double len = s.length, rand = Math.random() * len;
+        ThrowingSupplier<Double> getOne = () -> s.uAtDisplacement(len);
+        ThrowingSupplier<Double> getZero = () -> s.uAtDisplacement(0);
+        ThrowingSupplier<Double> getAny = () -> s.uAtDisplacement(rand);
+        double one = assertTimeout(Duration.of(millis, ChronoUnit.MILLIS), getOne);
+        double zero = assertTimeout(Duration.of(millis, ChronoUnit.MILLIS), getZero);
+        double any = assertTimeout(Duration.of(millis, ChronoUnit.MILLIS), getAny);
+
+        assertWithinError(one, 1);
+        assertWithinError(zero, 0);
+        assertTrue(0 <= any && any <= 1,
+                String.format("URand %f out of [0, 1] expected interval for internal param.", any));
+    }
+
+    void testDerivatives(){
+        Spline s = RoadResources.MathTests.testSpline;
+
+        double rand = Math.random();
+        Point2d ds = s.firstDerivativeAt(rand), dds = s.secondDerivativeAt(rand);
+
+        assertEquals(ds, s.firstDerivativeAt(rand));
+        assertEquals(dds, s.secondDerivativeAt(rand));
+    }
+
+    void testTangents(){}
+
+    void testSplineGeometry(){}
+
+    void testNullSpline(){
+        Spline s = Spline.getNullSpline();
+
+
+        // problem !!! most functions called on the null spline will throw numerous errors
+        // either create a NullSplineError or handle the null spline somehow
+    }
+
+    @Test
+    void testMathematicalStability() {
+        testDispFromParam();
+        testParamFromDisp();
+        testDerivatives();
+    }
+
 
     // this test checks if the python output and the java output
     // are within an error margin of 0.00001 (set in the py source)
+    // also checks that buildSpline6 runs in an acceptable
+    // time of 30 ms (set in the py source)
     @Test
     void testSplineBuild() throws IOException, InterruptedException {
         // get java output
         Instant start = Instant.now();
-        Spline s = Spline.buildSpline6(p1, p4, p2, p5, p3, p6);
+        Point2d[] p = RoadResources.MathTests.points;
+        Spline s = Spline.buildSpline6(p[0], p[3], p[1], p[4], p[2], p[5]);
         Instant end = Instant.now();
 
-        long elapsed = Duration.between(start, end).toNanos();
+        long elapsed = Duration.between(start, end).toMillis();
 
         // encode data to json
         StringBuffer jsonData = new StringBuffer();
@@ -39,8 +108,8 @@ public class MathTests {
                 .key("points")
                 .array();
 
-        for(Point2d p : Arrays.asList(p1, p2, p3, p4, p5, p6)){
-            jsonifier.array().value(p.getX()).value(p.getY()).endArray();
+        for(Point2d _p : p){
+            jsonifier.array().value(_p.getX()).value(_p.getY()).endArray();
         }
 
         Double[] xcoeffs = s.getXCoeffs(), ycoeffs = s.getYCoeffs();

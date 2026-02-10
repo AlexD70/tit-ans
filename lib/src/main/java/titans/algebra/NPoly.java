@@ -65,6 +65,7 @@ public class NPoly {
         return getDerivative().getDerivative();
     }
 
+    @SuppressWarnings("unused")
     public String repr() {
         String ret = "";
 
