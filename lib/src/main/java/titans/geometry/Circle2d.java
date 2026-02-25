@@ -11,4 +11,26 @@ public class Circle2d {
         this.center = center;
         this.radius = radius;
     }
+
+    // translate in the direction of the vector
+    public Circle2d translate(Vector2d translation){
+        this.center.translate(translation);
+        return this;
+    }
+
+    public double getCX(){
+        return center.x;
+    }
+
+    public double getCY(){
+        return center.y;
+    }
+
+    public double getR(){
+        return radius;
+    }
+
+    public boolean equals(Circle2d other){
+        return other.center.equals(this.center) && (Math.abs(other.radius - this.radius) < 0.0001);
+    }
 }

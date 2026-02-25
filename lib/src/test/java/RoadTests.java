@@ -24,32 +24,12 @@ public class RoadTests {
     static final double MAX_LEN_ERR = 0.01;
     public Road road = new Road();
 
-    public void buildTestRoad() throws IllegalAccessException, NoSuchFieldException {
+    public void buildTestRoad() {
         Spline c1 = Spline.getNullSpline();
         Spline c2 = Spline.getNullSpline();
 
-        Field xpoly = c1.getClass().getDeclaredField("xpoly");
-        xpoly.setAccessible(true);
-        Field ypoly = c1.getClass().getDeclaredField("ypoly");
-        ypoly.setAccessible(true);
-        Field startPoint = c1.getClass().getDeclaredField("startPoint");
-        startPoint.setAccessible(true);
-        Field length = c1.getClass().getDeclaredField("length");
-        length.setAccessible(true);
-
-        xpoly.set(c1, c1x);
-        ypoly.set(c1, c1y);
-        startPoint.set(c1, new Point2d(c1x.apply(0), c1y.apply(0)));
-
-        xpoly.set(c2, c2x);
-        ypoly.set(c2, c2y);
-        startPoint.set(c2, new Point2d(c2x.apply(0), c2y.apply(0)));
-
-        length.set(c1, c1.displacementAt(1));
-        length.set(c2, c2.displacementAt(1));
-
-        assertDoesNotThrow(c1::unsetNull);
-        assertDoesNotThrow(c2::unsetNull);
+        assertDoesNotThrow(() -> c1.setSpline(c1x, c1y, new Point2d(c1x.apply(0), c1y.apply(0))));
+        assertDoesNotThrow(() -> c2.setSpline(c2x, c2y, new Point2d(c2x.apply(0), c2y.apply(0))));
 
         road.addSpline(c1, false);
         road.addSpline(c2, false);
@@ -57,11 +37,7 @@ public class RoadTests {
 
     @Test
     void checkCurveLen(){
-        try {
-            buildTestRoad();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        buildTestRoad();
 
         System.out.println(road.getSegmentAtDisplacement(0).getFirst().displacementAt(1));
 

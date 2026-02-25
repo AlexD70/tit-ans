@@ -66,6 +66,10 @@ public class Vector2d {
         return this;
     }
 
+    public Vector2d norm() {
+        return this.mlt(1 / this.abs());
+    }
+
     public Vector2d diff(Vector2d other){
         return new Vector2d(this.x - other.x, this.y - other.y);
     }

@@ -11,6 +11,14 @@ public class HolonomicFollower {
     Feedforward feedforward;
     InterpolationLUT lut;
     Road road;
+    double lateralMlt = Math.sqrt(2);
+
+    public HolonomicFollower(double kV, double kA, double kStatic, double kP, double kD, double kI, double lateralMultiplier){
+        feedforward = new Feedforward(kV, kA, kStatic);
+        xPID = new PID(kP, kI, kD);
+        yPID = new PID(kP, kI, kD);
+        this.lateralMlt = lateralMultiplier;
+    }
 
     public HolonomicFollower(double kV, double kA, double kStatic, double kP, double kD, double kI){
         feedforward = new Feedforward(kV, kA, kStatic);
@@ -49,7 +57,7 @@ public class HolonomicFollower {
         reset();
         double ux = xPID.update(deltaPos.getX()) + feedforward.update(vel.getX(), accel.getX());
         double uy = yPID.update(deltaPos.getY()) + feedforward.update(vel.getY(), accel.getY());
-        return new Vector2d(ux, uy);
+        return new Vector2d(ux, uy * lateralMlt);
     }
 
     public Vector2d calculate(double time, Vector2d currentPos){

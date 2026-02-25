@@ -9,6 +9,7 @@ public class RoadResources {
         };
 
         public static final Spline testSpline = Spline.buildSpline6(points[0], points[1], points[2], points[3], points[4], points[5]);
+        public static final Spline testSpline2 = Spline.buildSpline6(points[3], points[4], points[2], points[5], points[0], points[1]);
         public static final long MAX_MILLIS_INTEGRATION = 10, MAX_MILLIS_BRENTOPT = 20;
     }
 }

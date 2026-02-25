@@ -1,8 +1,11 @@
 import org.json.JSONWriter;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.function.ThrowingSupplier;
+import titans.algebra.NPoly;
 import titans.geometry.Point2d;
+import titans.roads.Road;
 import titans.roads.Spline;
+import titans.util.NullSplineErr;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +18,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MathTests {
     public static final double EPS = 0.0001;
-    public void assertWithinError(double val, double ref){
+    public static void assertWithinError(double val, double ref){
         assertTrue(Math.abs(val - ref) <= EPS,
-                String.format("Value %f out of the expected %f +- EPS interval.", val, ref));
+                String.format("Value %f out of the expected %f +- %f interval.", val, ref, EPS));
+    }
+    public static void assertInInterval(double val, double low, double high){
+        assertTrue((low <= val) && (val <= high),
+                String.format("Value %f out of interval [%f, %f]", val, low, high));
+    }
+    public static void assertWithinError(double val, double ref, double eps){
+        assertTrue(Math.abs(val - ref) <= eps,
+                String.format("Value %f out of the expected %f +- %f interval.", val, ref, eps));
     }
 
     void testDispFromParam(){
@@ -37,6 +48,15 @@ public class MathTests {
         assertWithinError(resZero, 0);
         assertTrue(0 <= resRand && resRand <= s.length,
                 String.format("ResRand %f exceeds bounds of 0, %f when u = %f.", resRand, s.length, urand));
+    }
+
+    void testSplineEndPoint(){
+        Spline s = RoadResources.MathTests.testSpline;
+
+        Point2d endp = RoadResources.MathTests.points[1];
+
+        RoadBuilderTests.assertPointsEqual(endp, s.pointAt(1));
+        RoadBuilderTests.assertPointsEqual(endp, s.pointAtDisplacement(s.length));
     }
 
     void testParamFromDisp(){
@@ -67,16 +87,38 @@ public class MathTests {
         assertEquals(dds, s.secondDerivativeAt(rand));
     }
 
-    void testTangents(){}
+    void testTangents(){
+        Spline s = RoadResources.MathTests.testSpline;
+        Spline s2 = RoadResources.MathTests.testSpline2;
 
-    void testSplineGeometry(){}
+        double rand = Math.random();
+        double tangent1 = s.tangentAt(rand);
+        double tangent2 = s2.tangentAt(rand);
+        //assertInInterval(tangent1, -Math.PI, Math.PI);
+        assertEquals(tangent1, s.tangentAt(rand));
+        //assertInInterval(tangent2, -Math.PI, Math.PI);
+        assertEquals(tangent2, s2.tangentAt(rand));
+    }
 
     void testNullSpline(){
         Spline s = Spline.getNullSpline();
+        assertThrowsExactly(NullSplineErr.class, () -> s.tangentAt(1));
+        assertThrowsExactly(NullSplineErr.class, () -> s.uAtDisplacement(0));
+        assertThrowsExactly(NullSplineErr.class, () -> s.firstDerivativeAt(0));
+        assertThrowsExactly(NullSplineErr.class, () -> s.displacementAt(0));
+        assertThrowsExactly(NullSplineErr.class, () -> s.pointAtDisplacement(0));
+        assertThrowsExactly(NullSplineErr.class, () -> s.positionVectorAt(0));
+        assertThrowsExactly(NullSplineErr.class, () -> s.secondDerivativeAt(0));
+        assertThrowsExactly(NullSplineErr.class, s::getXCoeffs);
+        assertThrowsExactly(NullSplineErr.class, s::getYCoeffs);
 
-
-        // problem !!! most functions called on the null spline will throw numerous errors
-        // either create a NullSplineError or handle the null spline somehow
+        assertThrows(RuntimeException.class, s::unsetNull);
+        NPoly xpoly = new NPoly(5);
+        xpoly.assignCoefficients(1, 1, 1, 1, 1, 1);
+        NPoly ypoly = new NPoly(5);
+        ypoly.assignCoefficients(0, 0, 1, 0, 1, 0);
+        assertDoesNotThrow(() -> s.setSpline(xpoly, ypoly, new Point2d(0, 0)));
+        assertThrows(RuntimeException.class, () -> s.setSpline(xpoly, ypoly, new Point2d(0, 0)));
     }
 
     @Test
@@ -84,6 +126,9 @@ public class MathTests {
         testDispFromParam();
         testParamFromDisp();
         testDerivatives();
+        testTangents();
+        testNullSpline();
+        testSplineEndPoint();
     }
 
 

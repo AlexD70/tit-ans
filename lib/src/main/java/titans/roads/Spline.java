@@ -1,8 +1,11 @@
 package titans.roads;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
+import org.apache.commons.math3.analysis.differentiation.UnivariateDifferentiableFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
+import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.linear.*;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -88,6 +91,25 @@ public class Spline {
         return 0;
     }
 
+    /*
+    public double uAtDisplacementNewton(double d){
+        if(isNull) {
+            throw new NullSplineErr();
+        }
+
+        UnivariateDifferentiableFunction fx = new UnivariateDifferentiableFunction() {
+            @Override
+            public DerivativeStructure value(DerivativeStructure t) throws DimensionMismatchException {
+                return ;
+            }
+
+            @Override
+            public double value(double x) {
+                return displacementAt(x) - d;
+            }
+        }
+    }*/
+
     public double uAtDisplacement(double d){
         if(isNull){
             throw new NullSplineErr();
@@ -105,14 +127,14 @@ public class Spline {
             }
         };
 
-        BrentOptimizer brentopt = new BrentOptimizer(5e-5, 1e-7);
+        BrentOptimizer brentopt = new BrentOptimizer(1e-6, 1e-7);
         UnivariatePointValuePair res = brentopt.optimize(
                 new MaxEval(Integer.MAX_VALUE),
                 new MaxIter(1000),
                 new UnivariateObjectiveFunction(fx),
                 GoalType.MINIMIZE, new SearchInterval(0, 1),
                 // not sure this is a good first guess - some benchmarking required
-                new InitialGuess(new double[]{displacementAt(0.5)})
+                new InitialGuess(new double[]{0, 0.5, 1})
         );
 
         return res.getPoint();
@@ -147,8 +169,17 @@ public class Spline {
         if(isNull){
             throw new NullSplineErr();
         }
-        Point2d deriv = firstDerivativeAt(u);
-        return deriv.getY() / deriv.getX();
+        Vector2d deriv = firstDerivativeAt(u).toVector();
+        deriv.toPolar();
+        return deriv.getT();
+    }
+
+    public Vector2d tangentVectorAt(double u){
+        if(isNull){
+            throw new NullSplineErr();
+        }
+
+        return firstDerivativeAt(u).toVector().norm();
     }
 
     // this aims to replace the unit_arc_length function in segment.py
@@ -241,18 +272,39 @@ public class Spline {
     }
 
     public Double[] getXCoeffs(){
+        if (isNull) {
+            throw new NullSplineErr();
+        }
         return xpoly.getCoeffs();
     }
 
     public Double[] getYCoeffs(){
+        if (isNull) {
+            throw new NullSplineErr();
+        }
         return ypoly.getCoeffs();
     }
 
-    public void unsetNull() throws Exception{
-        if(xpoly != null && ypoly != null && length > 0){
-            isNull = false;
-        } else {
-            throw new Exception("Cannot unset null with empty polynomials or length");
+    public void unsetNull() {
+        if(!isNull){
+            return;
         }
+        if(xpoly != null && ypoly != null){
+            isNull = false;
+            this.length = displacementAt(1);
+        } else {
+            throw new RuntimeException("Cannot unset null with empty polynomials");
+        }
+    }
+
+    public void setSpline(NPoly xpoly, NPoly ypoly, Point2d startPoint) {
+        if(!isNull){
+            throw new RuntimeException("Do not modify non-null splines!");
+        }
+
+        this.xpoly = xpoly;
+        this.ypoly = ypoly;
+        this.startPoint = startPoint;
+        unsetNull();
     }
 }

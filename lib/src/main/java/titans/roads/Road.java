@@ -126,6 +126,14 @@ public class Road {
         return totalLength;
     }
 
+    public int getSegmentNum(){
+        return n;
+    }
+
+    public Spline getSegmentByIndex(int idx){
+        return segments.get(idx);
+    }
+
 //    public Point2d getDerivAtDisplacement(double d){
 //        Pair<Spline, Double> output = getSegmentAtDisplacement(d);
 //        Spline s = output.getFirst();

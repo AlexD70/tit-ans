@@ -17,19 +17,26 @@ This part of our codebase will be based on one of our alumni's work around wheel
 ## Project Roadmap
 
 - [x] Geometry API (probably not fully complete yet)
-- [ ] Algebra API?
 - [X] Motion profile implementation
 - [ ] Heading interpolation
 - [x] Parametric curves implementation
-- [x] RR-style path implementation (let's call them roads to differentiate ourselves)
+- [x] RR-style path implementation (let's call them roads)
 - [x] tangent calculation
 - [ ] Pure Pursuit path related stuff
 - [x] basic Holonomic Follower
+- [ ] basic Ramsete Follower
 - [ ] p2p follower
 - [x] Road building API
-- [ ] Road building tests
+- [x] Road building tests
 - [ ] equation & function cache to speed up computation
 - [x] interpolation LUT
 - [ ] publish to maven as a beta version
 - [ ] create a new project to link this to FTC robots
 - [ ] documentation?
+- [ ] more robust logging
+- [ ] add javafx plotting to remove the horrendous dependency on python's matplotlib
+- [ ] create custom exceptions to handle error cases
+- [ ] isolate internal library functions from the API
+- [ ] migrate math apis to apache math ???
+- [ ] perform benchmarks
+- [ ] WRITE DOCUMENTATION!!!

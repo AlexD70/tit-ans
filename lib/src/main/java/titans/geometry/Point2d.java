@@ -28,9 +28,17 @@ public class Point2d {
     public Vector2d toVector(){
         return new Vector2d(x, y);
     }
+    public Point2d translate(Vector2d translate){
+        this.x += translate.getX();
+        this.y += translate.getX();
+        return this;
+    }
 
     public static Vector2d distVector(Point2d a, Point2d b){
         return Vector2d.fromPolar(dist(a, b), Line2d.getSlope(a, b));
+    }
+    public Vector2d diff(Point2d other){
+        return distVector(this, other);
     }
 
     public static double dist(Point2d a, Point2d b){
