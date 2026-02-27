@@ -1,43 +1,34 @@
 package titans.roads;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.differentiation.DerivativeStructure;
-import org.apache.commons.math3.analysis.differentiation.UnivariateDifferentiableFunction;
 import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
-import org.apache.commons.math3.analysis.solvers.BrentSolver;
-import org.apache.commons.math3.exception.DimensionMismatchException;
 import org.apache.commons.math3.exception.TooManyEvaluationsException;
 import org.apache.commons.math3.linear.*;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.MaxIter;
-import org.apache.commons.math3.optim.linear.SolutionCallback;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.univariate.BrentOptimizer;
 import org.apache.commons.math3.optim.univariate.SearchInterval;
 import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import org.apache.commons.math3.optim.univariate.UnivariatePointValuePair;
+import org.apache.commons.math3.util.FastMath;
 import titans.algebra.NPoly;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
 import titans.util.NullSplineErr;
 import titans.util.Useless;
 
-import java.util.Arrays;
+import javax.annotation.Nonnull;
 
 public class Spline {
     NPoly xpoly = null, ypoly = null;
+    NPoly xderiv = null, yderiv = null;
+    NPoly x2ndderiv = null, y2ndderiv = null;
     public double length = -1;
     private boolean isNull = true;
     private Point2d startPoint = null, endPoint = null;
-    private static final double[][] systemMatrix = {
-            {0,  0,  0, 0, 0, 1},
-            {0,  0,  0, 0, 1, 0},
-            {0,  0,  0, 2, 0, 0},
-            {1,  1,  1, 1, 1, 1},
-            {5,  4,  3, 2, 1, 0},
-            {20, 12, 6, 2, 0, 0}
-    };
+
     private static final double[][] invertedSystemMatrix = {
             {-6,  -3, -0.5,  6,  -3,  0.5},
             { 15,  8,  1.5, -15,  7, -1},
@@ -69,7 +60,7 @@ public class Spline {
         try {
             return integrator.integrate(
                     1000,
-                    (t) -> Math.sqrt(Math.pow(xpoly.getDerivative().apply(t), 2) + Math.pow(ypoly.getDerivative().apply(t), 2)),
+                    (t) -> FastMath.sqrt(FastMath.pow(xpoly.getDerivative().apply(t), 2) + FastMath.pow(ypoly.getDerivative().apply(t), 2)),
                     0,
                     u
             );
@@ -77,7 +68,7 @@ public class Spline {
             try {
                 return integrator.integrate(
                         1_000_000,
-                        (t) -> Math.sqrt(Math.pow(xpoly.getDerivative().apply(t), 2) + Math.pow(ypoly.getDerivative().apply(t), 2)),
+                        (t) -> FastMath.sqrt(FastMath.pow(xpoly.getDerivative().apply(t), 2) + FastMath.pow(ypoly.getDerivative().apply(t), 2)),
                         0,
                         u
                 );
@@ -91,30 +82,12 @@ public class Spline {
         return 0;
     }
 
-    /*
-    public double uAtDisplacementNewton(double d){
-        if(isNull) {
-            throw new NullSplineErr();
-        }
-
-        UnivariateDifferentiableFunction fx = new UnivariateDifferentiableFunction() {
-            @Override
-            public DerivativeStructure value(DerivativeStructure t) throws DimensionMismatchException {
-                return ;
-            }
-
-            @Override
-            public double value(double x) {
-                return displacementAt(x) - d;
-            }
-        }
-    }*/
-
+    private double initialGuessCache = 0.5;
     public double uAtDisplacement(double d){
         if(isNull){
             throw new NullSplineErr();
         }
-         // skip checking if d > segment length for now
+        // skip checking if d > segment length for now
 
         UnivariateFunction fx = new UnivariateFunction() {
             @Override
@@ -123,7 +96,7 @@ public class Spline {
                 // doesnt search for fx = 0 but rather searches the function minimum
                 // and if the function happens to be negative at any point
                 // then the brentopt returns that rather than the desired point
-                return Math.abs(displacementAt(x) - d);
+                return FastMath.abs(displacementAt(x) - d);
             }
         };
 
@@ -134,10 +107,11 @@ public class Spline {
                 new UnivariateObjectiveFunction(fx),
                 GoalType.MINIMIZE, new SearchInterval(0, 1),
                 // not sure this is a good first guess - some benchmarking required
-                new InitialGuess(new double[]{0, 0.5, 1})
+                new InitialGuess(new double[]{0, initialGuessCache, 1})
         );
 
-        return res.getPoint();
+        initialGuessCache = res.getPoint();
+        return initialGuessCache;
     }
 
     public Point2d pointAtDisplacement(double d){
@@ -151,7 +125,7 @@ public class Spline {
         if(isNull){
             throw new NullSplineErr();
         }
-        return new Point2d(xpoly.getDerivative().apply(u), ypoly.getDerivative().apply(u));
+        return new Point2d(xderiv.apply(u), yderiv.apply(u));
     }
 
     public Point2d secondDerivativeAt(double u){
@@ -159,8 +133,8 @@ public class Spline {
             throw new NullSplineErr();
         }
         return new Point2d(
-                xpoly.getSecondDerivative().apply(u),
-                ypoly.getSecondDerivative().apply(u)
+                x2ndderiv.apply(u),
+                y2ndderiv.apply(u)
         );
     }
 
@@ -218,51 +192,10 @@ public class Spline {
         NPoly ypoly = new NPoly(5);
         ypoly.assignCoefficients(resultY.getColumn(0));
 
-        Spline spline = new Spline();
-        spline.startPoint = start;
+        Spline spline = getNullSpline();
+        spline.setSpline(xpoly, ypoly, start);
         spline.endPoint = end;
-        spline.xpoly = xpoly;
-        spline.ypoly = ypoly;
-        spline.isNull = false;
-        spline.length = spline.displacementAt(1);
-
-        return spline;
-    }
-
-    // TODO: use LU decomp to solve here
-    static RealMatrix A = MatrixUtils.createRealMatrix(systemMatrix);
-    static LUDecomposition lu = new LUDecomposition(A);
-    static DecompositionSolver solver = lu.getSolver();
-    public static Spline buildSpline6_LU(
-            Point2d start, Point2d end,
-            Point2d startDeriv, Point2d endDeriv,
-            Point2d start2ndDeriv, Point2d end2ndDeriv
-    ){
-        double[] rValueX = {
-                start.getX(), startDeriv.getX(), start2ndDeriv.getX(),
-                end.getX(), endDeriv.getX(), end2ndDeriv.getX()
-        };
-        double[] rValueY = {
-                start.getY(), startDeriv.getY(), start2ndDeriv.getY(),
-                end.getY(), endDeriv.getY(), end2ndDeriv.getY()
-        };
-
-        RealVector xvec = new ArrayRealVector(rValueX, false);
-        RealVector yvec = new ArrayRealVector(rValueY, false);
-        RealVector resultX = solver.solve(xvec);
-        RealVector resultY = solver.solve(yvec);
-        NPoly xpoly = new NPoly(5);
-        xpoly.assignCoefficients(resultX.toArray());
-        NPoly ypoly = new NPoly(5);
-        ypoly.assignCoefficients(resultY.toArray());
-
-        Spline spline = new Spline();
-        spline.startPoint = start;
-        spline.endPoint = end;
-        spline.xpoly = xpoly;
-        spline.ypoly = ypoly;
-        spline.isNull = false;
-        spline.length = spline.displacementAt(1);
+        spline.unsetNull();
 
         return spline;
     }
@@ -291,13 +224,20 @@ public class Spline {
         }
         if(xpoly != null && ypoly != null){
             isNull = false;
+            this.xderiv = xpoly.getDerivative();
+            this.x2ndderiv = xpoly.getSecondDerivative();
+            this.yderiv = ypoly.getDerivative();
+            this.y2ndderiv = ypoly.getSecondDerivative();
             this.length = displacementAt(1);
+            if(endPoint == null){
+                endPoint = pointAt(1);
+            }
         } else {
             throw new RuntimeException("Cannot unset null with empty polynomials");
         }
     }
 
-    public void setSpline(NPoly xpoly, NPoly ypoly, Point2d startPoint) {
+    public void setSpline(@Nonnull NPoly xpoly, @Nonnull NPoly ypoly, @Nonnull Point2d startPoint) {
         if(!isNull){
             throw new RuntimeException("Do not modify non-null splines!");
         }

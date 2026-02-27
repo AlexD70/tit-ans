@@ -28,4 +28,17 @@ public class KinematicStateXY {
 
         return new KinematicStateXY(possum.toPoint(), velsum, accsum);
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if (obj instanceof KinematicStateXY kst){
+            return (
+                    kst.position.equals(this.position) &&
+                    kst.velocity.equals(this.velocity) &&
+                    kst.acceleration.equals(this.acceleration)
+            );
+        } else {
+            return false;
+        }
+    }
 }

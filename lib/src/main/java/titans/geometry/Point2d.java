@@ -1,5 +1,7 @@
 package titans.geometry;
 
+import org.apache.commons.math3.util.FastMath;
+
 // a point in a 2d space
 // the constructor with no parameters returns the origin point
 public class Point2d {
@@ -16,7 +18,7 @@ public class Point2d {
         if(!(obj instanceof Point2d)){
             return false;
         }
-        return (Math.abs(((Point2d)obj).x - x) < 0.0001) && (Math.abs(((Point2d)obj).y - y) < 0.0001);
+        return (FastMath.abs(((Point2d)obj).x - x) < 0.0001) && (FastMath.abs(((Point2d)obj).y - y) < 0.0001);
     }
 
     public double getX(){
@@ -42,6 +44,6 @@ public class Point2d {
     }
 
     public static double dist(Point2d a, Point2d b){
-        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+        return FastMath.sqrt(FastMath.pow(a.x - b.x, 2) + FastMath.pow(a.y - b.y, 2));
     }
 }

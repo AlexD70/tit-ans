@@ -1,5 +1,7 @@
 package titans.geometry;
 
+import org.apache.commons.math3.util.FastMath;
+
 // stub
 // this represents a position vector
 // v = xi + yj
@@ -11,11 +13,12 @@ public class Vector2d {
     public Vector2d(double x, double y){
         this.x = x;
         this.y = y;
+        this.r = _abs();
     }
 
     public static Vector2d fromPolar(double r, double t){
-        Vector2d ret = new Vector2d(Math.cos(t) * r, Math.sin(t) * r);
-        ret.r = r;
+        Vector2d ret = new Vector2d(FastMath.cos(t) * r, FastMath.sin(t) * r);
+        // ret.r = r;
         ret.t = t;
 
         return ret;
@@ -23,8 +26,8 @@ public class Vector2d {
 
     // is this even right?
     public void toPolar(){
-        r = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-        t = Math.acos(x/r);
+        //r = FastMath.sqrt(FastMath.pow(x, 2) + FastMath.pow(y, 2));
+        t = FastMath.acos(x/r);
     }
 
     public double getX(){
@@ -39,12 +42,17 @@ public class Vector2d {
         return t;
     }
 
+    // this is the exact same as abs()
     public double getR(){
         return r;
     }
 
+    private double _abs(){
+        return FastMath.sqrt(FastMath.pow(x, 2) + FastMath.pow(y, 2));
+    }
+
     public double abs(){
-        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        return this.r;
     }
 
     /*
@@ -64,6 +72,15 @@ public class Vector2d {
         this.x *= scalar;
         this.y *= scalar;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if (obj instanceof Vector2d vect) {
+            return (FastMath.abs(vect.getX() - this.x) < 0.0001) && (FastMath.abs(vect.getY() - this.y) < 0.0001);
+        } else {
+            return false;
+        }
     }
 
     public Vector2d norm() {

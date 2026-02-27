@@ -53,7 +53,7 @@ tasks.named('test', Test) {
     }
 }
 
-tasks.register('visual-test', Test)
-tasks.named('visual-test', Test){
+tasks.register('visualtest', Test)
+tasks.named('visualtest', Test){
     useJUnitPlatform()
 }

@@ -1,5 +1,7 @@
 package titans.geometry;
 
+import org.apache.commons.math3.util.FastMath;
+
 // a circle in 2d space
 // by default, the circle built is the unit circle
 public class Circle2d {
@@ -31,6 +33,6 @@ public class Circle2d {
     }
 
     public boolean equals(Circle2d other){
-        return other.center.equals(this.center) && (Math.abs(other.radius - this.radius) < 0.0001);
+        return other.center.equals(this.center) && (FastMath.abs(other.radius - this.radius) < 0.0001);
     }
 }

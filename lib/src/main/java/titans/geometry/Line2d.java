@@ -1,5 +1,6 @@
 package titans.geometry;
 
+import org.apache.commons.math3.util.FastMath;
 import org.javatuples.Pair;
 import titans.util.Useless;
 
@@ -28,7 +29,7 @@ public class Line2d {
         this.a = a;
         this.b = b;
 
-        slope = Math.atan2(b.y - a.y, b.x - a.x);
+        slope = FastMath.atan2(b.y - a.y, b.x - a.x);
 //        nTerm = a.y - slope * a.x;
     }
     public Line2d(Point2d a, double m){
@@ -58,11 +59,11 @@ public class Line2d {
         double dy = b.y - a.y;
 
         // AX^2 + BX + C = 0
-        double freeTerm = Math.pow(a.x - c.getCX(), 2) + Math.pow(a.y - c.getCY(), 2) - Math.pow(c.getR(), 2); // C
+        double freeTerm = FastMath.pow(a.x - c.getCX(), 2) + FastMath.pow(a.y - c.getCY(), 2) - FastMath.pow(c.getR(), 2); // C
         double bTerm = 2 * (dx * (a.x - c.getCX()) + dy * (a.y - c.getCY())); // B
         double aTerm = dx * dx + dy * dy; // A
 
-        double discriminant = Math.pow(bTerm, 2) - 4 * aTerm * freeTerm;
+        double discriminant = FastMath.pow(bTerm, 2) - 4 * aTerm * freeTerm;
         if(discriminant < 0){
             return null;
         } else if (discriminant == 0){
@@ -72,7 +73,7 @@ public class Line2d {
 
             return new Pair<>(t, null);
         } else {
-            double sqrtDisc = Math.sqrt(discriminant);
+            double sqrtDisc = FastMath.sqrt(discriminant);
             double t1 = (-bTerm + sqrtDisc) / (2 * aTerm);
             double t2 = (-bTerm - sqrtDisc) / (2 * aTerm);
             //cachedT = new Pair<>(t1, t2);
