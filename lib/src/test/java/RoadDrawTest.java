@@ -1,5 +1,6 @@
 import org.apache.commons.math3.util.Pair;
 import org.json.JSONWriter;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import titans.geometry.Point2d;
 import titans.roads.*;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RoadDrawTest {
-    @Test
+    @Tag("visual") @Test
     void showTestRoad() throws IOException, InterruptedException {
         RoadBuilder builder = new RoadBuilder(new Point2d(2, 2), 0, 0);
         Road road = builder
@@ -24,7 +25,7 @@ public class RoadDrawTest {
         drawRoad(road, 0.1);
     }
 
-    @Test
+    @Tag("visual") @Test
     void showTestMotionProfile() throws IOException, InterruptedException {
         RoadBuilder builder = new RoadBuilder(new Point2d(), 0, 0);
         Road road = builder
