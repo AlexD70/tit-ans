@@ -136,7 +136,7 @@ public class MathTests {
     // are within an error margin of 0.00001 (set in the py source)
     // also checks that buildSpline6 runs in an acceptable
     // time of 30 ms (set in the py source)
-    @Test
+    @Tag("visual") @Test
     void testSplineBuild() throws IOException, InterruptedException {
         // get java output
         Instant start = Instant.now();

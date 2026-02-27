@@ -48,5 +48,12 @@ pytest {
 
 tasks.named('test', Test) {
     // Use JUnit Platform for unit tests.
+    useJUnitPlatform {
+        excludeTags("visual")
+    }
+}
+
+tasks.register('visual-test', Test)
+tasks.named('visual-test', Test){
     useJUnitPlatform()
 }
