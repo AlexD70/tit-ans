@@ -1,8 +1,42 @@
-# Project Roadmap
+# tit\ans (tit-slash-ans)
 
-- [ ] Geometry API
-- [ ] Algebra API
-- [ ] Parametric curves implementation
-- [ ] RR-style path implementation (let's call them roads to differentiate ourselves)
+## What is this project?
+
+TITANS FTC team 19055's efforts to squash many years of experience into a library for FTC robots. Our aim is not only to provide a solid alternative to RoadRunner but also to allow teams (including ourselves) to use PurePursuit and provide many more utilities.
+
+For now, the project is in a WIP stage and no versions are available yet.
+
+## How is our RoadRunner replacement going to work?
+
+This part of our codebase will be based on one of our alumni's work around wheeled robots motion planning linked here: [Vlad Chira's Path Planner](https://github.com/VladChira/pypathplanner/tree/master)
+
+## Features
+
+### This section is not ready yet!
+
+## Project Roadmap
+
+- [x] Geometry API (probably not fully complete yet)
+- [X] Motion profile implementation
+- [ ] Heading interpolation
+- [x] Parametric curves implementation
+- [x] RR-style path implementation (let's call them roads)
+- [x] tangent calculation
 - [ ] Pure Pursuit path related stuff
-- [ ] Path following?
+- [x] basic Holonomic Follower
+- [ ] basic Ramsete Follower
+- [ ] p2p follower
+- [x] Road building API
+- [x] Road building tests
+- [ ] equation & function cache to speed up computation
+- [x] interpolation LUT
+- [ ] publish to maven as a beta version
+- [ ] create a new project to link this to FTC robots
+- [ ] documentation?
+- [ ] more robust logging
+- [ ] add javafx plotting to remove the horrendous dependency on python's matplotlib
+- [ ] create custom exceptions to handle error cases
+- [ ] isolate internal library functions from the API
+- [ ] migrate math apis to apache math ???
+- [ ] perform benchmarks
+- [ ] WRITE DOCUMENTATION!!!
