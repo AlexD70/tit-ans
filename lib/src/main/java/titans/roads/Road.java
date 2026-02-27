@@ -112,10 +112,8 @@ public class Road {
     public @Nullable Double getCurvatureAtDisplacement(double d){
         Pair<Spline, Double> output = getSegmentAtDisplacement(d);
         Spline s = output.getFirst();
-        System.out.print("output.second - u ");
 
         double u = s.uAtDisplacement(output.getSecond());
-        System.out.println(u);
         Vector2d vec1stDeriv = s.firstDerivativeAt(u).toVector();
         Vector2d vec2ndDeriv = s.secondDerivativeAt(u).toVector();
 

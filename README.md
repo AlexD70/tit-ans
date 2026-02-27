@@ -40,3 +40,4 @@ This part of our codebase will be based on one of our alumni's work around wheel
 - [ ] migrate math apis to apache math ???
 - [ ] perform benchmarks
 - [ ] WRITE DOCUMENTATION!!!
+- [ ] MIGRATE TO JAVATUPLES!!!

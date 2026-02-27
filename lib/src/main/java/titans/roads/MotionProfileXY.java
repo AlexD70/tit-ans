@@ -1,5 +1,6 @@
 package titans.roads;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.Pair;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
@@ -14,7 +15,6 @@ public class MotionProfileXY {
     // this describes the speed by displacement
     private ArrayList<Pair<Double, Double>> dispProfile = new ArrayList<>(100);
     public ArrayList<Pair<Double, KinematicStateXY>> timeProfile = new ArrayList<>();
-    public ArrayList<Pair<Double, KinematicState>> timeProfileX = new ArrayList<>(), timeProfileY = new ArrayList<>();
 
     protected MotionProfileXY(){}
 
@@ -56,8 +56,12 @@ public class MotionProfileXY {
         int i = 1;
         int sgm_num = 0, last_sgm = 0;
         for(double d : linspaceDisplacement){
-            double curvature = road.getCurvatureAtDisplacement(d);
-            System.out.print("curvature: "); System.out.println(curvature);
+            Double curvature = road.getCurvatureAtDisplacement(d);
+            if(curvature == null){
+                throw new RuntimeException("FATAL ERROR WHILE BUILDING MOTION PROFILE. ABORTING");
+            }
+
+            //System.out.print("curvature: "); System.out.println(curvature);
             Point2d tanPoint = road.getDerivAtDisplacement(d);
             double tan = 0;
             if(tanPoint == null){
@@ -66,14 +70,14 @@ public class MotionProfileXY {
                 tan = tanPoint.toVector().abs();
             }
 
-            double vmax_ang = constraints.maxAngVel / Math.abs(curvature * 2);
+            double vmax_ang = constraints.maxAngVel / FastMath.abs(curvature * 2);
             double vmax2 = Double.POSITIVE_INFINITY;
 
             sgm_num = road.getSegmentIndexAtDisplacement(d);
             if(sgm_num != last_sgm){
                 last_sgm = sgm_num;
                 double waypoint_dist = road.lenarr[sgm_num] - road.lenarr[sgm_num - 1];
-                double time = Math.sqrt(2 * waypoint_dist / max_acc);
+                double time = FastMath.sqrt(2 * waypoint_dist / max_acc);
                 vmax2 = max_acc * time;
 
                 if(Double.isInfinite(tan)){
@@ -87,7 +91,8 @@ public class MotionProfileXY {
             if(Double.isInfinite(vmax2)){
                 vmax2 = max_vel + 1;
             }
-            double plannedVel = Math.min(Math.min(max_vel, vmax_ang), vmax2);
+            double plannedVel = FastMath.min(FastMath.min(max_vel, vmax_ang), vmax2);
+            System.out.printf("%f planned vel%n", plannedVel);
             profile.dispProfile.add(new Pair<>(d, plannedVel));
             i++;
         }
@@ -109,8 +114,8 @@ public class MotionProfileXY {
                 double d = current.getFirst();
                 double deltaDisp = d - prev.getFirst();
 
-                double maxVel = Math.sqrt(Math.pow(prevVel, 2) + 2 * deltaDisp * max_acc);
-                profile.dispProfile.set(j, new Pair<>(d, Math.min(maxVel, currentVel)));
+                double maxVel = FastMath.sqrt(FastMath.pow(prevVel, 2) + 2 * deltaDisp * max_acc);
+                profile.dispProfile.set(j, new Pair<>(d, FastMath.min(maxVel, currentVel)));
             }
         }
 
@@ -124,15 +129,13 @@ public class MotionProfileXY {
                 double d1 = current.getFirst(), d2 = next.getFirst();
                 double deltaDisp = d1 - d2;
 
-                double maxVel = Math.sqrt(Math.pow(currentVel, 2) + 2 * deltaDisp * max_acc);
-                profile.dispProfile.set(j - 1, new Pair<>(d2, Math.min(maxVel, nextVel)));
+                double maxVel = FastMath.sqrt(FastMath.pow(currentVel, 2) + 2 * deltaDisp * max_acc);
+                profile.dispProfile.set(j - 1, new Pair<>(d2, FastMath.min(maxVel, nextVel)));
             }
         }
 
         // turn to time based profile
         profile.timeProfile.ensureCapacity(i);
-        profile.timeProfileX.ensureCapacity(i);
-        profile.timeProfileY.ensureCapacity(i);
 
         profile.addToProfile(
                 0d,
@@ -144,10 +147,7 @@ public class MotionProfileXY {
         );
 
         Vector2d tanVec = road.getDerivAtDispNonnull(0).toVector();
-        tanVec.mlt(1 / tanVec.abs());
-
-        profile.addToProfile(profile.timeProfileX, 0, 0, initVel / tanVec.getX(), initAcc / tanVec.getX());
-        profile.addToProfile(profile.timeProfileY, 0, 0, initVel / tanVec.getY(), initAcc / tanVec.getY());
+        tanVec.norm();
 
         double lastTime = 0, time = 0;
         double lastVel, currentVel;
@@ -157,11 +157,11 @@ public class MotionProfileXY {
             currentVel = current.getSecond();
             lastVel = last.getSecond();
             double ds = current.getFirst() - last.getFirst();
-            double dt = ds / ((currentVel + lastVel) / 2); // ds / med_vel
+            double dt = FastMath.abs(ds / ((currentVel + lastVel) / 2)); // ds / med_vel
             time += dt;
 
             Point2d tanPoint = road.getDerivAtDispNonnull(current.getFirst());
-            tanVec.mlt(1 / tanVec.abs()); // normalize the vector
+            tanVec.norm(); // normalize the vector
 
             double vx = currentVel * tanVec.getX(), vy = currentVel * tanVec.getY();
             double accel = (currentVel - lastVel) / (time - lastTime);
@@ -173,9 +173,6 @@ public class MotionProfileXY {
                     point,
                     vx, vy, ax, ay
             );
-
-            profile.addToProfile(profile.timeProfileX, time, point.getX(), vx, ax);
-            profile.addToProfile(profile.timeProfileY, time, point.getY(), vy, ay);
 
             lastTime = time;
         }
