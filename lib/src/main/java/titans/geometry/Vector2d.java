@@ -13,12 +13,11 @@ public class Vector2d {
     public Vector2d(double x, double y){
         this.x = x;
         this.y = y;
-        this.r = _abs();
     }
 
     public static Vector2d fromPolar(double r, double t){
         Vector2d ret = new Vector2d(FastMath.cos(t) * r, FastMath.sin(t) * r);
-        // ret.r = r;
+        ret.r = r;
         ret.t = t;
 
         return ret;
@@ -26,7 +25,7 @@ public class Vector2d {
 
     // is this even right?
     public void toPolar(){
-        //r = FastMath.sqrt(FastMath.pow(x, 2) + FastMath.pow(y, 2));
+        r = FastMath.sqrt(FastMath.pow(x, 2) + FastMath.pow(y, 2));
         t = FastMath.acos(x/r);
     }
 
@@ -42,17 +41,12 @@ public class Vector2d {
         return t;
     }
 
-    // this is the exact same as abs()
     public double getR(){
         return r;
     }
 
-    private double _abs(){
-        return FastMath.sqrt(FastMath.pow(x, 2) + FastMath.pow(y, 2));
-    }
-
     public double abs(){
-        return this.r;
+        return FastMath.sqrt(FastMath.pow(x, 2) + FastMath.pow(y, 2));
     }
 
     /*

@@ -1,5 +1,6 @@
 package titans.roads;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.Pair;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
@@ -59,7 +60,7 @@ public class Road {
         }
 
         int index = binSearchRecursive(0, n, d);
-        return new Pair<>(segments.get(index), Math.abs(d - ((index == 0)?(0):(lenarr[index - 1]))));
+        return new Pair<>(segments.get(index), FastMath.abs(d - ((index == 0)?(0):(lenarr[index - 1]))));
     }
 
     public Triplet<Spline, Double, Boolean> getSgmIndexAtDisp(double d){
@@ -68,7 +69,7 @@ public class Road {
         }
 
         int index = binSearchRecursive(0, n, d);
-        double delta_d = Math.abs(d - ((index == 0)?(0):(lenarr[index - 1])));
+        double delta_d = FastMath.abs(d - ((index == 0)?(0):(lenarr[index - 1])));
         return new Triplet<>(segments.get(index), delta_d, (delta_d < eps)?(isContinous.get(index)):(true));
     }
 
@@ -117,7 +118,7 @@ public class Road {
         Vector2d vec1stDeriv = s.firstDerivativeAt(u).toVector();
         Vector2d vec2ndDeriv = s.secondDerivativeAt(u).toVector();
 
-        return vec1stDeriv.cross(vec2ndDeriv) / Math.pow(vec1stDeriv.abs(), 3);
+        return vec1stDeriv.cross(vec2ndDeriv) / FastMath.pow(vec1stDeriv.abs(), 3);
     }
 
     public double getLength(){

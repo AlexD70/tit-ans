@@ -1,5 +1,6 @@
 package titans.roads;
 
+import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.Pair;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
@@ -22,11 +23,11 @@ public class InterpolationLUT {
 
         int iter = 0;
         while(iter < maxIter) {
-            if (Math.abs(t - first) <= eps) {
+            if (FastMath.abs(t - first) <= eps) {
                 // do not go to next here
                 return values.get(first);
 
-            } else if (Math.abs(t - second) <= eps) {
+            } else if (FastMath.abs(t - second) <= eps) {
                 first += 1;
                 second += 1;
                 return values.get(second);
@@ -35,8 +36,8 @@ public class InterpolationLUT {
                 // do not go to next in this branch
                 KinematicStateXY state1 = values.get(first);
                 KinematicStateXY state2 = values.get(second);
-                double totaltime = Math.abs(time2 - time1);
-                double dtime = Math.abs(t - time1);
+                double totaltime = FastMath.abs(time2 - time1);
+                double dtime = FastMath.abs(t - time1);
 
                 return KinematicStateXY.getLinearInterpolation(state1, state2, totaltime, dtime);
 

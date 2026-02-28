@@ -61,7 +61,6 @@ public class MotionProfileXY {
                 throw new RuntimeException("FATAL ERROR WHILE BUILDING MOTION PROFILE. ABORTING");
             }
 
-            //System.out.print("curvature: "); System.out.println(curvature);
             Point2d tanPoint = road.getDerivAtDisplacement(d);
             double tan = 0;
             if(tanPoint == null){
@@ -92,7 +91,6 @@ public class MotionProfileXY {
                 vmax2 = max_vel + 1;
             }
             double plannedVel = FastMath.min(FastMath.min(max_vel, vmax_ang), vmax2);
-            System.out.printf("%f planned vel%n", plannedVel);
             profile.dispProfile.add(new Pair<>(d, plannedVel));
             i++;
         }

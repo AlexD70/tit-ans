@@ -1,5 +1,6 @@
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
@@ -39,7 +40,7 @@ public class MotionProfileTests {
     Pair<MotionProfileXY, Road> res2 = buildTestProfile(constr, 0, 0, 0, 2000);
     MotionProfileXY prof1 = res1.getValue0(), prof2 = res2.getValue0();
 
-    @Test
+    @Tag("test") @Test
     void checkMathematicalStability(){
         int n = prof1.timeProfile.size();
         int m = prof2.timeProfile.size();
@@ -56,7 +57,7 @@ public class MotionProfileTests {
     }
 
 
-    @Test
+    @Tag("test") @Test
     void checkSanity(){
         MotionProfileXY prof = prof1;
         int n = prof.timeProfile.size();
@@ -85,7 +86,7 @@ public class MotionProfileTests {
     // i have a feeling it doesnt test anything useful
     // currently disabled too because it keeps failing
     // and ive no idea how to fix it
-    @Test @Disabled
+    @Tag("test") @Test @Disabled
     void checkConstraints(){
          MotionProfileXY prof = prof1;
          int n = prof.timeProfile.size();
