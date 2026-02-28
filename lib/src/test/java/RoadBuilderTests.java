@@ -1,4 +1,5 @@
 import org.apache.commons.math3.util.Pair;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import titans.geometry.Point2d;
 import titans.geometry.Vector2d;
@@ -60,7 +61,7 @@ public class RoadBuilderTests {
         }
     }
 
-    @Test
+    @Tag("test") @Test
     void checkEndPoints() throws NoSuchFieldException, IllegalAccessException {
         Road r1 = generateTestRoad(true);
         Road r2 = generateTestRoad(false);
@@ -100,7 +101,7 @@ public class RoadBuilderTests {
         }
     }
 
-    @Test
+    @Tag("test") @Test
     // this sometimes fails because the tangentAt func sometimes gives a negative value
     // im not sure if this is a problem but lets keep it in mind
     // for now i'll add math.abs
@@ -145,7 +146,7 @@ public class RoadBuilderTests {
         }
     }
 
-    @Test
+    @Tag("test") @Test
     void checkEnd2ndDerivs() throws NoSuchFieldException, IllegalAccessException {
         Road r1 = generateTestRoad(true);
         Road r2 = generateTestRoad(false);
@@ -185,7 +186,7 @@ public class RoadBuilderTests {
         }
     }
 
-    @Test
+    @Tag("test") @Test
     void checkRoadStartTangent(){
         Road r1 = generateTestRoad(false);
 
@@ -201,7 +202,7 @@ public class RoadBuilderTests {
         MathTests.assertWithinError(deriv.getT(), Math.abs(tangents[0]));
     }
 
-    @Test
+    @Tag("test") @Test
     void checkC2Continuity(){
         Road r1 = generateTestRoad(true);
         Road r2 = generateTestRoad(false);
@@ -247,7 +248,7 @@ public class RoadBuilderTests {
     - check if 2nd deriv is 0 at endpoints ----- done
      */
 
-    @Test
+    @Tag("test") @Test
     void testRoadBuilder(){
         // should assert a timeout here for road building
         Road r = generateTestRoad(true);

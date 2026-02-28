@@ -37,7 +37,7 @@ This part of our codebase will be based on one of our alumni's work around wheel
 - [ ] add javafx plotting to remove the horrendous dependency on python's matplotlib
 - [ ] create custom exceptions to handle error cases
 - [ ] isolate internal library functions from the API
-- [ ] migrate math apis to apache math ???
+- [x] migrate math apis to apache math (for now, Math -> FastMath)
 - [ ] perform benchmarks
 - [ ] WRITE DOCUMENTATION!!!
 - [ ] MIGRATE TO JAVATUPLES!!!

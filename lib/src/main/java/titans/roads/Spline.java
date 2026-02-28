@@ -60,7 +60,7 @@ public class Spline {
         try {
             return integrator.integrate(
                     1000,
-                    (t) -> FastMath.sqrt(FastMath.pow(xpoly.getDerivative().apply(t), 2) + FastMath.pow(ypoly.getDerivative().apply(t), 2)),
+                    (t) -> FastMath.sqrt(FastMath.pow(xderiv.apply(t), 2) + FastMath.pow(yderiv.apply(t), 2)),
                     0,
                     u
             );
@@ -68,7 +68,7 @@ public class Spline {
             try {
                 return integrator.integrate(
                         1_000_000,
-                        (t) -> FastMath.sqrt(FastMath.pow(xpoly.getDerivative().apply(t), 2) + FastMath.pow(ypoly.getDerivative().apply(t), 2)),
+                        (t) -> FastMath.sqrt(FastMath.pow(xderiv.apply(t), 2) + FastMath.pow(yderiv.apply(t), 2)),
                         0,
                         u
                 );

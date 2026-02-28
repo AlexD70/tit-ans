@@ -1,5 +1,6 @@
 package titans.roads;
 
+import org.apache.commons.math3.util.FastMath;
 import titans.algebra.NPoly;
 import titans.geometry.Line2d;
 import titans.geometry.Point2d;
@@ -47,7 +48,7 @@ public class RoadBuilder {
         if(prev == null) {
             r = Point2d.dist(start, end);
         } else {
-            r = 2 * Math.max(Point2d.dist(start, end), Point2d.dist(prev, start));
+            r = 2 * FastMath.max(Point2d.dist(start, end), Point2d.dist(prev, start));
         }
 
         return Vector2d.fromPolar(r, startTangent);
@@ -74,7 +75,7 @@ public class RoadBuilder {
             System.exit(-1);
         }
 
-        boolean cont = Math.abs(startDeriv - Line2d.getSlope(startPoint, endPoint)) < eps;
+        boolean cont = FastMath.abs(startDeriv - Line2d.getSlope(startPoint, endPoint)) < eps;
         road.addSpline(s, cont);
 
         startDeriv = Line2d.getSlope(startPoint, endPoint);

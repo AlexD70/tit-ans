@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import titans.algebra.NPoly;
 import titans.geometry.Point2d;
@@ -35,7 +36,7 @@ public class RoadTests {
         road.addSpline(c2, false);
     }
 
-    @Test
+    @Tag("test") @Test
     void checkCurveLen(){
         buildTestRoad();
 

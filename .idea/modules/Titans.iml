@@ -13,6 +13,8 @@
       <excludeFolder url="file://$MODULE_DIR$/../../build" />
       <excludeFolder url="file://$MODULE_DIR$/../../.vim" />
       <excludeFolder url="file://$MODULE_DIR$/../../venv" />
+      <excludeFolder url="file://$MODULE_DIR$/../../.vim" />
+      <excludeFolder url="file://$MODULE_DIR$/../../venv" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

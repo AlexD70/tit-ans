@@ -121,7 +121,7 @@ public class MathTests {
         assertThrows(RuntimeException.class, () -> s.setSpline(xpoly, ypoly, new Point2d(0, 0)));
     }
 
-    @Test
+    @Tag("test") @Test
     void testMathematicalStability() {
         testDispFromParam();
         testParamFromDisp();
