@@ -49,11 +49,22 @@ pytest {
 tasks.named('test', Test) {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform {
-        excludeTags("visual")
+        excludeTags("visual", "benchmark")
+        includeTags("test")
     }
 }
 
 tasks.register('visualtest', Test)
 tasks.named('visualtest', Test){
-    useJUnitPlatform()
+    useJUnitPlatform {
+        includeTags("visual")
+        excludeTags("benchmark", "test")
+    }
+}
+
+tasks.register('benchmark', Test) {
+    useJUnitPlatform {
+        includeTags("benchmark")
+        excludeTags("visual", "test")
+    }
 }
